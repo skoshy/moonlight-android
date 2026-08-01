@@ -465,10 +465,28 @@ public class Game extends AppCompatActivity implements SurfaceHolder.Callback,
 
         rootView = streamContainer.getParent();
 
-        //串流画面 顶部居中显示
-        if(prefConfig.alignDisplayTopCenter){
+        //串流画面 对齐方式
+        {
             FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) streamContainer.getLayoutParams();
-            params.gravity = Gravity.CENTER_HORIZONTAL|Gravity.TOP;
+            if (prefConfig.displayAlignment == PreferenceConfiguration.DisplayAlignment.TOP_CENTER) {
+                params.gravity = Gravity.CENTER_HORIZONTAL | Gravity.TOP;
+            } else if (prefConfig.displayAlignment == PreferenceConfiguration.DisplayAlignment.TOP_LEFT) {
+                params.gravity = Gravity.LEFT | Gravity.TOP;
+            } else if (prefConfig.displayAlignment == PreferenceConfiguration.DisplayAlignment.TOP_RIGHT) {
+                params.gravity = Gravity.RIGHT | Gravity.TOP;
+            } else if (prefConfig.displayAlignment == PreferenceConfiguration.DisplayAlignment.CENTER_LEFT) {
+                params.gravity = Gravity.LEFT | Gravity.CENTER_VERTICAL;
+            } else if (prefConfig.displayAlignment == PreferenceConfiguration.DisplayAlignment.CENTER_RIGHT) {
+                params.gravity = Gravity.RIGHT | Gravity.CENTER_VERTICAL;
+            } else if (prefConfig.displayAlignment == PreferenceConfiguration.DisplayAlignment.BOTTOM_LEFT) {
+                params.gravity = Gravity.LEFT | Gravity.BOTTOM;
+            } else if (prefConfig.displayAlignment == PreferenceConfiguration.DisplayAlignment.BOTTOM_CENTER) {
+                params.gravity = Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM;
+            } else if (prefConfig.displayAlignment == PreferenceConfiguration.DisplayAlignment.BOTTOM_RIGHT) {
+                params.gravity = Gravity.RIGHT | Gravity.BOTTOM;
+            } else {
+                params.gravity = Gravity.CENTER;
+            }
         }
         // Listen for touch events on the background touch view to enable trackpad mode
         // to work on areas outside of the StreamView itself. We use a separate View

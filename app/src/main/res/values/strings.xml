@@ -212,6 +212,8 @@
     <string name="video_scale_mode_fit">Fit</string>
     <string name="video_scale_mode_fill">Fill</string>
     <string name="video_scale_mode_stretch">Stretch</string>
+    <string name="title_video_fit_scale">Video Fit Scale Factor</string>
+    <string name="summary_video_fit_scale">Scale down the video stream when in Fit mode.</string>
 
     <string name="category_audio_settings">Audio Settings</string>
     <string name="title_audio_config_list">Surround sound configuration</string>
@@ -505,6 +507,16 @@
     <string name="summary_fullexdisplay_mode">Allows full immersive secondary screen mode with automatically matched refresh rate and resolution. Manual settings won\'t apply in this mode.</string>
     <string name="title_top_center_display">Display in Top Center</string>
     <string name="summary_top_center_display">Streaming picture will be aligned to the top of the screen instead of centered when resolution is not native.</string>
+    <string name="title_display_alignment">Display Alignment</string>
+    <string name="summary_display_alignment">Select how the streaming video aligns to the screen when using a non-native aspect ratio.</string>
+    <string name="align_top_left">Top Left</string>
+    <string name="align_top_center">Top Center</string>
+    <string name="align_top_right">Top Right</string>
+    <string name="align_center_left">Center Left</string>
+    <string name="align_center_right">Center Right</string>
+    <string name="align_bottom_left">Bottom Left</string>
+    <string name="align_bottom_center">Bottom Center</string>
+    <string name="align_bottom_right">Bottom Right</string>
     <string name="title_touch_sensitivity">Touch Screen Sensitivity</string>
     <string name="summary_touch_sensitivity">When enabled, you can manually adjust the touch sensitivity.</string>
     <string name="title_global_touch_sensitivity">Touch Screen Sensitivity Global Effect</string>

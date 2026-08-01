@@ -192,6 +192,8 @@
     <string name="video_scale_mode_fit">Fit</string>
     <string name="video_scale_mode_fill">Fill</string>
     <string name="video_scale_mode_stretch">Stretch</string>
+    <string name="title_video_fit_scale">Tỷ lệ thu phóng chế độ Fit</string>
+    <string name="summary_video_fit_scale">Thu nhỏ luồng video khi ở chế độ Fit.</string>
 
     <string name="category_audio_settings">Cài đặt âm thanh</string>
     <string name="title_audio_config_list">Cấu hình âm thanh vòm</string>
@@ -472,6 +474,16 @@
 
     <string name="title_top_center_display">Hiển thị ở giữa trên</string>
     <string name="summary_top_center_display">Khi độ phân giải không phải gốc, hình ảnh stream sẽ căn lên trên thay vì ở giữa.</string>
+    <string name="title_display_alignment">Căn lề hiển thị</string>
+    <string name="summary_display_alignment">Chọn cách căn lề video khi sử dụng tỷ lệ không phải gốc.</string>
+    <string name="align_top_left">Trên cùng bên trái</string>
+    <string name="align_top_center">Ở giữa trên</string>
+    <string name="align_top_right">Trên cùng bên phải</string>
+    <string name="align_center_left">Ở giữa bên trái</string>
+    <string name="align_center_right">Ở giữa bên phải</string>
+    <string name="align_bottom_left">Dưới cùng bên trái</string>
+    <string name="align_bottom_center">Ở giữa dưới</string>
+    <string name="align_bottom_right">Dưới cùng bên phải</string>
 
     <string name="title_touch_sensitivity">Độ nhạy cảm ứng</string>
     <string name="summary_touch_sensitivity">Khi bật, bạn có thể điều chỉnh độ nhạy cảm ứng thủ công.</string>

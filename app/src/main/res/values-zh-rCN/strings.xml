@@ -296,6 +296,8 @@
     <string name="video_scale_mode_fit">适应</string>
     <string name="video_scale_mode_fill">填充</string>
     <string name="video_scale_mode_stretch">拉伸</string>
+    <string name="title_video_fit_scale">适应模式视频缩放比例</string>
+    <string name="summary_video_fit_scale">在“适应”模式下按比例缩小视频画面。</string>
     <string name="title_privacy_policy">隐私政策</string>
     <string name="summary_privacy_policy">查看  Artemis  隐私政策</string>
     <string name="category_help">帮助</string>
@@ -445,6 +447,16 @@
     <string name="summary_exdisplay_mode">串流画面显示在显示器，虚拟按键及性能信息等控件在手机屏幕。</string>
     <string name="title_top_center_display">画面顶部居中显示</string>
     <string name="summary_top_center_display">非原生分辨率时，画面将与顶部对齐而非居中显示。</string>
+    <string name="title_display_alignment">画面对齐方式</string>
+    <string name="summary_display_alignment">当分辨率非原生时，选择画面在屏幕上的对齐方式。</string>
+    <string name="align_top_left">左上角</string>
+    <string name="align_top_center">顶部居中</string>
+    <string name="align_top_right">右上角</string>
+    <string name="align_center_left">靠左居中</string>
+    <string name="align_center_right">靠右居中</string>
+    <string name="align_bottom_left">左下角</string>
+    <string name="align_bottom_center">底部居中</string>
+    <string name="align_bottom_right">右下角</string>
     <string name="title_touch_sensitivity">触控屏幕灵敏度</string>
     <string name="summary_touch_sensitivity">开启后，可手动调整触控灵敏度。</string>
     <string name="title_global_touch_sensitivity">触控屏幕灵敏度全局生效</string>

@@ -16,7 +16,6 @@ public class PanZoomHandler {
     private final Game game;
     private final View streamView;
     private final PreferenceConfiguration prefConfig;
-    private final boolean isTopMode;
     private final ScaleGestureDetector scaleGestureDetector;
     private final GestureDetector gestureDetector;
     private View parent;
@@ -30,7 +29,6 @@ public class PanZoomHandler {
         this.streamView = streamView;
         this.parent = parent;
         this.prefConfig = prefConfig;
-        this.isTopMode = prefConfig.alignDisplayTopCenter;
         scaleGestureDetector = new ScaleGestureDetector(context, new ScaleListener());
         gestureDetector = new GestureDetector(context, new GestureListener());
 
@@ -55,15 +53,31 @@ public class PanZoomHandler {
         updateDimensions();
 
         if (parentWidth >= childWidth) {
-            childX = (parentWidth - childWidth) / 2;
+            if (prefConfig.displayAlignment == PreferenceConfiguration.DisplayAlignment.TOP_LEFT ||
+                prefConfig.displayAlignment == PreferenceConfiguration.DisplayAlignment.CENTER_LEFT ||
+                prefConfig.displayAlignment == PreferenceConfiguration.DisplayAlignment.BOTTOM_LEFT) {
+                childX = 0;
+            } else if (prefConfig.displayAlignment == PreferenceConfiguration.DisplayAlignment.TOP_RIGHT ||
+                       prefConfig.displayAlignment == PreferenceConfiguration.DisplayAlignment.CENTER_RIGHT ||
+                       prefConfig.displayAlignment == PreferenceConfiguration.DisplayAlignment.BOTTOM_RIGHT) {
+                childX = parentWidth - childWidth;
+            } else {
+                childX = (parentWidth - childWidth) / 2;
+            }
         } else {
             float boundaryX = parentWidth - childWidth;
             childX = Math.max(boundaryX, Math.min(childX, 0));
         }
 
         if (parentHeight >= childHeight) {
-            if (isTopMode) {
+            if (prefConfig.displayAlignment == PreferenceConfiguration.DisplayAlignment.TOP_CENTER ||
+                prefConfig.displayAlignment == PreferenceConfiguration.DisplayAlignment.TOP_LEFT ||
+                prefConfig.displayAlignment == PreferenceConfiguration.DisplayAlignment.TOP_RIGHT) {
                 childY = 0;
+            } else if (prefConfig.displayAlignment == PreferenceConfiguration.DisplayAlignment.BOTTOM_CENTER ||
+                       prefConfig.displayAlignment == PreferenceConfiguration.DisplayAlignment.BOTTOM_LEFT ||
+                       prefConfig.displayAlignment == PreferenceConfiguration.DisplayAlignment.BOTTOM_RIGHT) {
+                childY = parentHeight - childHeight;
             } else {
                 childY = (parentHeight - childHeight) / 2;
             }

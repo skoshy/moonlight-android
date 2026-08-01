@@ -141,6 +141,11 @@ public class StreamContainer extends FrameLayout implements SurfaceHolder.Callba
                 measuredWidth = widthSize;
                 measuredHeight = (int)(measuredWidth / desiredAspectRatio);
             }
+            if (prefConfig != null) {
+                float scale = prefConfig.videoFitScalePercent / 100f;
+                measuredWidth = (int)(measuredWidth * scale);
+                measuredHeight = (int)(measuredHeight * scale);
+            }
         }
 
         setMeasuredDimension(measuredWidth, measuredHeight);

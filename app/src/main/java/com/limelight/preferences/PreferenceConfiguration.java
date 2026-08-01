@@ -17,6 +17,18 @@ public class PreferenceConfiguration {
         STRETCH
     }
 
+    public enum DisplayAlignment {
+        CENTER,
+        TOP_LEFT,
+        TOP_CENTER,
+        TOP_RIGHT,
+        CENTER_LEFT,
+        CENTER_RIGHT,
+        BOTTOM_LEFT,
+        BOTTOM_CENTER,
+        BOTTOM_RIGHT
+    }
+
     public enum FormatOption {
         AUTO,
         FORCE_AV1,
@@ -51,6 +63,8 @@ public class PreferenceConfiguration {
     private static final String RESOLUTION_SCALE_FACTOR_PREF_STRING = "seekbar_resolution_scale_factor";
     private static final String RESUME_WITHOUT_CONFIRM_PREF_STRING = "checkbox_resume_without_confirm";
     private static final String VIDEO_SCALE_MODE_PREF_STRING = "list_video_scale_mode";
+    private static final String VIDEO_FIT_SCALE_PREF_STRING = "seekbar_video_fit_scale";
+    private static final int DEFAULT_VIDEO_FIT_SCALE = 100;
     private static final String SOPS_PREF_STRING = "checkbox_enable_sops";
     private static final String DISABLE_TOASTS_PREF_STRING = "checkbox_disable_warnings";
     private static final String HOST_AUDIO_PREF_STRING = "checkbox_host_audio";
@@ -99,6 +113,8 @@ public class PreferenceConfiguration {
     private static final String PREVENT_PACKET_LOSS_PREF_STRING = "checkbox_prevent_packet_loss";
 
     private static final String LIST_ONSCREEN_KEYBOARD_ALIGN_MODE = "list_onscreen_keyboard_align_mode";
+    private static final String DISPLAY_ALIGNMENT_PREF_STRING = "list_display_alignment";
+    private static final String DEFAULT_DISPLAY_ALIGNMENT = "center";
 
     private static final String CHECKBOX_ENABLE_BATTERY_REPORT = "checkbox_gamepad_enable_battery_report";
     private static final String CHECKBOX_FORCE_QWERTY = "checkbox_force_qwerty";
@@ -246,6 +262,7 @@ public class PreferenceConfiguration {
     public String onscreenKeyboardAlignMode;
     public boolean enforceDisplayMode, useVirtualDisplay, enableSops, playHostAudio, disableWarnings, fullScreen;
     public ScaleMode videoScaleMode;
+    public int videoFitScalePercent;
     public String language;
     public int renderMode;
     public boolean smallIconMode, multiController, usbDriver, flipFaceButtons;
@@ -299,8 +316,8 @@ public class PreferenceConfiguration {
 
     public boolean enableFullExDisplay;
 
-    //串流画面顶部居中显示
-    public boolean alignDisplayTopCenter;
+    //画面对齐方式
+    public DisplayAlignment displayAlignment;
 
     //触控屏幕灵敏度
     public int touchSensitivityX;
@@ -623,6 +640,48 @@ public class PreferenceConfiguration {
         }
     }
 
+    private static DisplayAlignment getDisplayAlignment(Context context) {
+        SharedPreferences prefs = ProfilesManager.getInstance().getOverlayingSharedPreferences(context);
+
+        // Migrate legacy checkbox_enable_view_top_center to list_display_alignment
+        if (prefs.contains("checkbox_enable_view_top_center")) {
+            boolean legacyTopCenter = prefs.getBoolean("checkbox_enable_view_top_center", false);
+            prefs.edit()
+                    .remove("checkbox_enable_view_top_center")
+                    .putString(DISPLAY_ALIGNMENT_PREF_STRING, legacyTopCenter ? "top_center" : "center")
+                    .apply();
+        }
+
+        String str = prefs.getString(DISPLAY_ALIGNMENT_PREF_STRING, DEFAULT_DISPLAY_ALIGNMENT);
+        if (str.equals("top_left")) {
+            return DisplayAlignment.TOP_LEFT;
+        }
+        else if (str.equals("top_center")) {
+            return DisplayAlignment.TOP_CENTER;
+        }
+        else if (str.equals("top_right")) {
+            return DisplayAlignment.TOP_RIGHT;
+        }
+        else if (str.equals("center_left")) {
+            return DisplayAlignment.CENTER_LEFT;
+        }
+        else if (str.equals("center_right")) {
+            return DisplayAlignment.CENTER_RIGHT;
+        }
+        else if (str.equals("bottom_left")) {
+            return DisplayAlignment.BOTTOM_LEFT;
+        }
+        else if (str.equals("bottom_center")) {
+            return DisplayAlignment.BOTTOM_CENTER;
+        }
+        else if (str.equals("bottom_right")) {
+            return DisplayAlignment.BOTTOM_RIGHT;
+        }
+        else {
+            return DisplayAlignment.CENTER;
+        }
+    }
+
     public static String getSelectedFramePacingName(Context context) {
         SharedPreferences prefs = ProfilesManager.getInstance().getOverlayingSharedPreferences(context);
         return prefs.getString(FRAME_PACING_PREF_STRING, DEFAULT_FRAME_PACING);
@@ -854,6 +913,7 @@ private static int getFramePacingValue(Context context) {
         }
 
         config.videoScaleMode = getVideoScaleMode(context);
+        config.videoFitScalePercent = prefs.getInt(VIDEO_FIT_SCALE_PREF_STRING, DEFAULT_VIDEO_FIT_SCALE);
 
         config.videoFormat = getVideoFormatValue(context);
         config.framePacing = getFramePacingValue(context);
@@ -965,7 +1025,7 @@ private static int getFramePacingValue(Context context) {
 
         config.enableFullExDisplay=prefs.getBoolean("checkbox_enable_fullexdisplay",false);
 
-        config.alignDisplayTopCenter =prefs.getBoolean("checkbox_enable_view_top_center",false);
+        config.displayAlignment = getDisplayAlignment(context);
 
         config.touchSensitivityX =prefs.getInt(SEEKBAR_TOUCH_SENSITIVITY,100);
 

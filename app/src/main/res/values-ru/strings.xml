@@ -334,6 +334,8 @@
     <string name="summary_video_scale_mode">Выберите между Подогнать, Заполнить и Растянуть.</string>
     <string name="video_scale_mode_fit">Подогнать</string>
     <string name="video_scale_mode_fill">Заполнить</string>
+    <string name="title_video_fit_scale">Масштаб в режиме \"Подогнать\"</string>
+    <string name="summary_video_fit_scale">Уменьшить видеопоток в режиме \"Подогнать\".</string>
     <string name="title_checkbox_force_device_motion">Всегда использовать датчики движения устройства.</string>
     <string name="title_hide_osc_when_has_gamepad">Скрывать экранные кнопки при использовании контроллера</string>
     <string name="title_show_guide_button">Показать кнопку Guide</string>
@@ -447,6 +449,16 @@
     <string name="summary_fullexdisplay_mode">Полноценный второй экран с автоматическим подбором частоты и разрешения. Ручные настройки не применяются.</string>
     <string name="title_top_center_display">Отображать вверху по центру</string>
     <string name="summary_top_center_display">При ненативном разрешении изображение будет выравнено по верхнему краю экрана вместо центрирования.</string>
+    <string name="title_display_alignment">Выравнивание экрана</string>
+    <string name="summary_display_alignment">Выберите выравнивание видеопотока при использовании ненативного соотношения сторон.</string>
+    <string name="align_top_left">Вверху слева</string>
+    <string name="align_top_center">Вверху по центру</string>
+    <string name="align_top_right">Вверху справа</string>
+    <string name="align_center_left">По центру слева</string>
+    <string name="align_center_right">По центру справа</string>
+    <string name="align_bottom_left">Внизу слева</string>
+    <string name="align_bottom_center">Внизу по центру</string>
+    <string name="align_bottom_right">Внизу справа</string>
     <string name="title_touch_sensitivity">Чувствительность сенсора</string>
     <string name="summary_touch_sensitivity">При включении можно вручную регулировать чувствительность касаний</string>
     <string name="title_global_touch_sensitivity">Глобальный эффект чувствительности сенсора</string>

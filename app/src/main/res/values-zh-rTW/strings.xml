@@ -212,6 +212,8 @@
 	<string name="video_scale_mode_fit">符合</string>
 	<string name="video_scale_mode_fill">填滿</string>
 	<string name="video_scale_mode_stretch">拉伸</string>
+	<string name="title_video_fit_scale">符合模式影片縮放比例</string>
+	<string name="summary_video_fit_scale">在「符合」模式下按比例縮小影片畫面。</string>
 
 	<string name="category_audio_settings">音訊設定</string>
 	<string name="title_audio_config_list">環繞音效配置</string>
@@ -535,6 +537,16 @@
 
 	<string name="title_top_center_display">置頂置中顯示</string>
 	<string name="summary_top_center_display">當解析度非原生時，串流畫面將對齊螢幕頂部而非置中。</string>
+	<string name="title_display_alignment">畫面對齊方式</string>
+	<string name="summary_display_alignment">當解析度非原生時，選擇畫面在螢幕上的對齊方式。</string>
+	<string name="align_top_left">左上角</string>
+	<string name="align_top_center">置頂置中</string>
+	<string name="align_top_right">右上角</string>
+	<string name="align_center_left">靠左置中</string>
+	<string name="align_center_right">靠右置中</string>
+	<string name="align_bottom_left">左下角</string>
+	<string name="align_bottom_center">底部置中</string>
+	<string name="align_bottom_right">右下角</string>
 
 	<string name="title_touch_sensitivity">觸控靈敏度</string>
 	<string name="summary_touch_sensitivity">啟用後，可手動調整觸控靈敏度。</string>

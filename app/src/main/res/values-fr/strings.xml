@@ -186,6 +186,8 @@
     <string name="video_scale_mode_fit">Ajuster</string>
     <string name="video_scale_mode_fill">Remplir</string>
     <string name="video_scale_mode_stretch">Étirer</string>
+    <string name="title_video_fit_scale">Facteur d\'échelle vidéo Ajuster</string>
+    <string name="summary_video_fit_scale">Réduire la taille du flux vidéo en mode Ajuster.</string>
 
     <string name="category_audio_settings">Paramètres audio</string>
     <string name="title_audio_config_list">Configuration son surround</string>
@@ -439,6 +441,16 @@
     <string name="summary_exdisplay_mode">Affichage du flux sur le moniteur, boutons virtuels et informations de performance et autres contrôles sur l\'écran du téléphone.</string>
     <string name="title_top_center_display">Affichage en haut au centre</string>
     <string name="summary_top_center_display">L\'image de streaming sera alignée en haut de l\'écran au lieu d\'être centrée lorsque la résolution n\'est pas native.</string>
+    <string name="title_display_alignment">Alignement de l\'affichage</string>
+    <string name="summary_display_alignment">Choisissez comment aligner la vidéo lorsque le format n\'est pas natif.</string>
+    <string name="align_top_left">En haut à gauche</string>
+    <string name="align_top_center">En haut au centre</string>
+    <string name="align_top_right">En haut à droite</string>
+    <string name="align_center_left">Au centre à gauche</string>
+    <string name="align_center_right">Au centre à droite</string>
+    <string name="align_bottom_left">En bas à gauche</string>
+    <string name="align_bottom_center">En bas au centre</string>
+    <string name="align_bottom_right">En bas à droite</string>
     <string name="title_touch_sensitivity">Sensibilité de l\'écran tactile</string>
     <string name="summary_touch_sensitivity">Lorsqu\'il est activé, vous pouvez ajuster manuellement la sensibilité tactile.</string>
     <string name="title_global_touch_sensitivity">Sensibilité tactile globale</string>

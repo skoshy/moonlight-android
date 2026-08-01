@@ -99,11 +99,13 @@
             android:title="@string/title_checkbox_auto_invert_video_resolution"
             app:iconSpaceReserved="false" />
 
-        <CheckBoxPreference
-            android:defaultValue="false"
-            android:key="checkbox_enable_view_top_center"
-            android:summary="@string/summary_top_center_display"
-            android:title="@string/title_top_center_display"
+        <ListPreference
+            android:defaultValue="center"
+            android:entries="@array/display_align_names"
+            android:entryValues="@array/display_align_values"
+            android:key="list_display_alignment"
+            android:summary="@string/summary_display_alignment"
+            android:title="@string/title_display_alignment"
             app:iconSpaceReserved="false" />
 
         <com.limelight.preferences.SeekBarPreference
@@ -128,6 +130,20 @@
             android:summary="@string/summary_video_scale_mode"
             android:title="@string/title_video_scale_mode"
             app:iconSpaceReserved="false" />
+
+        <com.limelight.preferences.SeekBarPreference
+            android:defaultValue="100"
+            android:dialogMessage=""
+            android:key="seekbar_video_fit_scale"
+            android:max="100"
+            android:summary="@string/summary_video_fit_scale"
+            android:text="%"
+            android:title="@string/title_video_fit_scale"
+            app:iconSpaceReserved="false"
+            seekbar:divisor="1"
+            seekbar:keyStep="0"
+            seekbar:min="10"
+            seekbar:step="1" />
 
         <EditTextPreference
             android:defaultValue="1920x1080"
