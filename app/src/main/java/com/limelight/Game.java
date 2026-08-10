@@ -106,6 +106,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ImageButton;
+import android.widget.SeekBar;
+import android.widget.LinearLayout;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationManagerCompat;
@@ -4028,6 +4030,126 @@ public class Game extends AppCompatActivity implements SurfaceHolder.Callback,
         } else {
             currentOrientation = Configuration.ORIENTATION_LANDSCAPE;
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE);
+        }
+    }
+
+    public void showFitScaleDialog(Context themedContext) {
+        float density = themedContext.getResources().getDisplayMetrics().density;
+        int paddingVertical = (int) (12 * density);
+        int paddingHorizontal = (int) (20 * density);
+
+        LinearLayout layout = new LinearLayout(themedContext);
+        layout.setOrientation(LinearLayout.HORIZONTAL);
+        layout.setGravity(Gravity.CENTER_VERTICAL);
+        layout.setPadding(paddingHorizontal, paddingVertical, paddingHorizontal, paddingVertical);
+
+        android.graphics.drawable.GradientDrawable bg = new android.graphics.drawable.GradientDrawable();
+        bg.setShape(android.graphics.drawable.GradientDrawable.RECTANGLE);
+        bg.setColor(android.graphics.Color.parseColor("#E6222222")); // Premium dark charcoal, 90% opacity
+        bg.setCornerRadius(24 * density); // Rounded pill corners
+        layout.setBackground(bg);
+
+        final TextView valText = new TextView(themedContext);
+        valText.setTextColor(android.graphics.Color.WHITE);
+        valText.setTextSize(14);
+        int currentScale = prefConfig != null ? prefConfig.videoFitScalePercent : 100;
+        valText.setText(getString(R.string.video_scale_mode_fit) + ": " + currentScale + "%");
+
+        SeekBar seekBar = new SeekBar(themedContext);
+        seekBar.setMax(90); // 10% to 100%
+        seekBar.setProgress(currentScale - 10);
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                int actualScale = progress + 10;
+                valText.setText(getString(R.string.video_scale_mode_fit) + ": " + actualScale + "%");
+                if (prefConfig != null) {
+                    prefConfig.videoFitScalePercent = actualScale;
+                }
+                if (streamContainer != null) {
+                    streamContainer.requestLayout();
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {}
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {}
+        });
+
+        LinearLayout.LayoutParams seekBarParams = new LinearLayout.LayoutParams(
+                0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f);
+        seekBarParams.leftMargin = (int) (12 * density);
+        seekBar.setLayoutParams(seekBarParams);
+
+        layout.addView(valText);
+        layout.addView(seekBar);
+
+        AlertDialog dialog = new AlertDialog.Builder(themedContext)
+                .setView(layout)
+                .create();
+
+        dialog.setCanceledOnTouchOutside(true);
+        dialog.show();
+
+        Window window = dialog.getWindow();
+        if (window != null) {
+            window.setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+            window.setGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL);
+
+            WindowManager.LayoutParams lp = window.getAttributes();
+            lp.width = (int) (320 * density); // Very compact width
+            lp.y = (int) (40 * density);      // Float slightly above the bottom
+            window.setAttributes(lp);
+        }
+    }
+
+    public void showDisplayAlignmentDialog(Context themedContext) {
+        String[] alignmentNames = themedContext.getResources().getStringArray(R.array.display_align_names);
+        int currentSelection = prefConfig != null ? prefConfig.displayAlignment.ordinal() : 0;
+
+        new AlertDialog.Builder(themedContext)
+                .setTitle(R.string.title_display_alignment)
+                .setSingleChoiceItems(alignmentNames, currentSelection, (dialog, which) -> {
+                    PreferenceConfiguration.DisplayAlignment selectedAlignment =
+                            PreferenceConfiguration.DisplayAlignment.values()[which];
+                    updateDisplayAlignment(selectedAlignment);
+                    dialog.dismiss();
+                })
+                .setNegativeButton(android.R.string.cancel, (dialog, which) -> dialog.dismiss())
+                .create()
+                .show();
+    }
+
+    public void updateDisplayAlignment(PreferenceConfiguration.DisplayAlignment alignment) {
+        if (prefConfig != null) {
+            prefConfig.displayAlignment = alignment;
+        }
+        if (streamContainer != null) {
+            FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) streamContainer.getLayoutParams();
+            if (params != null) {
+                if (alignment == PreferenceConfiguration.DisplayAlignment.TOP_CENTER) {
+                    params.gravity = Gravity.CENTER_HORIZONTAL | Gravity.TOP;
+                } else if (alignment == PreferenceConfiguration.DisplayAlignment.TOP_LEFT) {
+                    params.gravity = Gravity.LEFT | Gravity.TOP;
+                } else if (alignment == PreferenceConfiguration.DisplayAlignment.TOP_RIGHT) {
+                    params.gravity = Gravity.RIGHT | Gravity.TOP;
+                } else if (alignment == PreferenceConfiguration.DisplayAlignment.CENTER_LEFT) {
+                    params.gravity = Gravity.LEFT | Gravity.CENTER_VERTICAL;
+                } else if (alignment == PreferenceConfiguration.DisplayAlignment.CENTER_RIGHT) {
+                    params.gravity = Gravity.RIGHT | Gravity.CENTER_VERTICAL;
+                } else if (alignment == PreferenceConfiguration.DisplayAlignment.BOTTOM_LEFT) {
+                    params.gravity = Gravity.LEFT | Gravity.BOTTOM;
+                } else if (alignment == PreferenceConfiguration.DisplayAlignment.BOTTOM_CENTER) {
+                    params.gravity = Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM;
+                } else if (alignment == PreferenceConfiguration.DisplayAlignment.BOTTOM_RIGHT) {
+                    params.gravity = Gravity.RIGHT | Gravity.BOTTOM;
+                } else {
+                    params.gravity = Gravity.CENTER;
+                }
+                streamContainer.setLayoutParams(params);
+            }
         }
     }
 

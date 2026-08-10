@@ -325,6 +325,22 @@ public class GameMenu implements Game.GameMenuCallbacks {
                     game::rotateScreen));
         }
 
+        options.add(new MenuOption(getString(R.string.title_video_fit_scale), true,
+                () -> {
+                    hideMenu();
+                    int themeResId = game.getApplicationInfo().theme;
+                    Context themedContext = new ContextThemeWrapper(dialogScreenContext, themeResId);
+                    game.showFitScaleDialog(themedContext);
+                }));
+
+        options.add(new MenuOption(getString(R.string.title_display_alignment), true,
+                () -> {
+                    hideMenu();
+                    int themeResId = game.getApplicationInfo().theme;
+                    Context themedContext = new ContextThemeWrapper(dialogScreenContext, themeResId);
+                    game.showDisplayAlignmentDialog(themedContext);
+                }));
+
         options.add(new MenuOption(getString(R.string.game_menu_advanced), true,
                 () -> showAdvancedMenu(device)));
 
