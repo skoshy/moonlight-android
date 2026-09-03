@@ -204,6 +204,8 @@ def main():
     parser.add_argument("--apk", dest="apk_path", default=None, help="Explicit path to built APK file to upload")
     parser.add_argument("--tag", dest="explicit_tag", default=None, help="Explicit git release tag (e.g., v20.2.7 or 20.2.7)")
     parser.add_argument("--tag-prefix", dest="tag_prefix", default=None, help="Prefix for version tag (e.g. 'v' or '')")
+    parser.add_argument("--title", dest="release_title", default=None, help="Custom release title (defaults to v<version> or <version>)")
+    parser.add_argument("--notes", dest="custom_notes", default=None, help="Custom release notes to include above auto-generated changelog")
     parser.add_argument("-y", "--yes", action="store_true", help="Skip confirmation prompt")
     parser.add_argument("--draft", action="store_true", help="Save release as draft on GitHub")
     parser.add_argument("--prerelease", action="store_true", help="Mark release as pre-release on GitHub")
@@ -339,6 +341,7 @@ def main():
 
     # Prepare named release assets
     prepared_apks = []
+    latest_built_version = version_name
     print(f"\n📦 Found {len(release_apks)} release APK asset(s):")
     for apk_source in release_apks:
         orig_name = apk_source.stem
@@ -361,10 +364,12 @@ def main():
                 for elem in elements:
                     if elem.get("outputFile") == apk_source.name and "versionName" in elem:
                         built_version = elem["versionName"]
+                        latest_built_version = built_version
                         break
                 else:
                     if elements and "versionName" in elements[0]:
                         built_version = elements[0]["versionName"]
+                        latest_built_version = built_version
             except Exception:
                 pass
 
@@ -397,10 +402,25 @@ def main():
 
     # 8. Create GitHub Release
     print(f"\n🌐 Creating GitHub release '{tag}' and uploading assets...")
+
+    notes_parts = ["### 📦 Build Info"]
+    notes_parts.append(f"- **Version:** `{version_name}`")
+    if latest_built_version and latest_built_version != version_name:
+        notes_parts.append(f"- **Build Number:** `{latest_built_version}`")
+    notes_parts.append(f"- **Version Code:** `{version_code}`")
+    notes_parts.append(f"- **Commit:** `{head_sha[:7]}`\n")
+
+    if args.custom_notes:
+        notes_parts.append(args.custom_notes.strip() + "\n")
+
+    release_notes = "\n".join(notes_parts)
+    default_title = args.release_title or (f"v{version_name}" if tag.startswith("v") else version_name)
+
     release_cmd = [
         "gh", "release", "create", tag,
         *[str(apk) for apk in prepared_apks],
-        "--title", f"v{version_name}" if tag.startswith("v") else version_name,
+        "--title", default_title,
+        "--notes", release_notes,
         "--generate-notes",
         "--target", head_sha
     ]
