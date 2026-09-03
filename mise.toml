@@ -1,0 +1,46 @@
+[tools]
+java = "openjdk-19.0.1"
+
+[tasks.bump-version]
+description = "Bump the application version (major, minor, or patch)"
+run = "./scripts/bump-version.sh"
+
+[tasks.bump]
+description = "Alias for bump-version"
+run = "./scripts/bump-version.sh"
+
+[tasks.version]
+description = "Print current version and dynamic build number"
+run = "./gradlew printVersion -q"
+
+[tasks.build]
+description = "Build the primary debug application (nonRoot_game)"
+run = "./gradlew assembleNonRoot_gameDebug"
+
+[tasks.build-all]
+description = "Build all debug application variants (root and nonRoot_game)"
+run = "./gradlew assembleDebug"
+
+[tasks.build-release]
+description = "Build the release application APKs"
+run = "./gradlew assembleRelease"
+
+[tasks.release]
+description = "Build release APKs and create a GitHub Release with assets attached"
+run = "./scripts/release-github.sh"
+
+[tasks.install]
+description = "Build and install the debug app onto connected Android device"
+run = "./gradlew assembleNonRoot_gameDebug && ./scripts/install-debug.sh"
+
+[tasks.logcat]
+description = "Capture application crash logs via logcat"
+run = "./scripts/logcat-capture.sh"
+
+[tasks.test]
+description = "Run unit tests"
+run = "./gradlew testNonRoot_gameDebugUnitTest"
+
+[tasks.clean]
+description = "Clean build directory"
+run = "./gradlew clean"

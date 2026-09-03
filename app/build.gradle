@@ -1,4 +1,42 @@
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import org.gradle.api.provider.Property
+import org.gradle.api.file.RegularFileProperty
+
 apply plugin: 'com.android.application'
+
+abstract class GenerateVersionNameTask extends DefaultTask {
+    @Input
+    abstract Property<String> getBaseVersion()
+
+    @Input
+    @Optional
+    abstract Property<String> getCustomBuildNumber()
+
+    @OutputFile
+    abstract RegularFileProperty getOutputFile()
+
+    GenerateVersionNameTask() {
+        outputs.upToDateWhen { false }
+    }
+
+    @TaskAction
+    void action() {
+        String buildNum = (customBuildNumber.present && !customBuildNumber.get().trim().isEmpty()) ?
+            customBuildNumber.get().trim() :
+            LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyMMddHHmmss"))
+        String fullVersion = "${baseVersion.get()}.${buildNum}"
+        outputFile.get().asFile.text = fullVersion
+    }
+}
+
+def versionPropsFile = rootProject.file("version.properties")
+def versionProperties = new Properties()
+if (versionPropsFile.exists()) {
+    versionPropsFile.withInputStream { versionProperties.load(it) }
+}
+def baseVersionName = versionProperties.getProperty("baseVersionName", "20.2.6")
+def appVersionCode = Integer.parseInt(versionProperties.getProperty("versionCode", "57"))
 
 android {
     ndkVersion "27.0.12077973"
@@ -11,8 +49,8 @@ android {
         minSdk 21
         targetSdk 34
 
-        versionName "20.2.6"
-        versionCode = 57
+        versionName baseVersionName
+        versionCode appVersionCode
 
         // Generate native debug symbols to allow Google Play to symbolicate our native crashes
         ndk.debugSymbolLevel = 'FULL'
@@ -160,6 +198,35 @@ android {
 
     testOptions {
         unitTests.includeAndroidResources = true
+    }
+}
+
+androidComponents {
+    onVariants(selector().all(), { variant ->
+        def versionTask = tasks.register("${variant.name}VersionNameTask", GenerateVersionNameTask) {
+            baseVersion.set(baseVersionName)
+            customBuildNumber.set(
+                providers.gradleProperty("buildNumber")
+                    .orElse(providers.environmentVariable("BUILD_NUMBER"))
+            )
+            outputFile.set(layout.buildDirectory.file("intermediates/version/${variant.name}-version.txt"))
+        }
+
+        variant.outputs.each { output ->
+            output.versionName.set(
+                versionTask.flatMap { it.outputFile.map { file -> file.asFile.text.trim() } }
+            )
+        }
+    })
+}
+
+tasks.register("printVersion") {
+    description = "Prints current version info"
+    doLast {
+        def nowBuild = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyMMddHHmmss"))
+        println "baseVersionName=$baseVersionName"
+        println "versionCode=$appVersionCode"
+        println "versionName=$baseVersionName.$nowBuild"
     }
 }
 
