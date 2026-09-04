@@ -223,7 +223,11 @@ androidComponents {
 tasks.register("printVersion") {
     description = "Prints current version info"
     doLast {
-        def nowBuild = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyMMddHHmmss"))
+        def customBuildNumber = providers.gradleProperty("buildNumber")
+            .orElse(providers.environmentVariable("BUILD_NUMBER"))
+        def nowBuild = (customBuildNumber.present && !customBuildNumber.get().trim().isEmpty()) ?
+            customBuildNumber.get().trim() :
+            LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyMMddHHmmss"))
         println "baseVersionName=$baseVersionName"
         println "versionCode=$appVersionCode"
         println "versionName=$baseVersionName.$nowBuild"

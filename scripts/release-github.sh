@@ -18,6 +18,27 @@ import re
 import json
 import argparse
 from pathlib import Path
+from datetime import datetime
+
+def get_build_number(custom_build_number: str = None) -> str:
+    if custom_build_number and custom_build_number.strip():
+        return custom_build_number.strip()
+    env_bn = os.environ.get("BUILD_NUMBER")
+    if env_bn and env_bn.strip():
+        return env_bn.strip()
+    return datetime.now().strftime("%y%m%d%H%M%S")
+
+def check_remote_tag_exists(project_root: Path, tag_name: str) -> bool:
+    try:
+        res = subprocess.run(
+            ["git", "ls-remote", "--tags", "origin", f"refs/tags/{tag_name}"],
+            cwd=str(project_root),
+            capture_output=True,
+            text=True
+        )
+        return bool(res.stdout.strip())
+    except Exception:
+        return False
 
 def get_app_name(project_root: Path, explicit_name: str = None) -> str:
     if explicit_name:
@@ -204,7 +225,11 @@ def main():
     parser.add_argument("--apk", dest="apk_path", default=None, help="Explicit path to built APK file to upload")
     parser.add_argument("--tag", dest="explicit_tag", default=None, help="Explicit git release tag (e.g., v20.2.7 or 20.2.7)")
     parser.add_argument("--tag-prefix", dest="tag_prefix", default=None, help="Prefix for version tag (e.g. 'v' or '')")
-    parser.add_argument("--title", dest="release_title", default=None, help="Custom release title (defaults to v<version> or <version>)")
+    parser.add_argument("--include-build-number", dest="include_build_number", action="store_true", default=None, help="Include build number in the release tag")
+    parser.add_argument("--no-build-number", dest="include_build_number", action="store_false", help="Do not include build number in the release tag")
+    parser.add_argument("--build-number", dest="custom_build_number", default=None, help="Explicit build number to use (defaults to timestamp yyMMddHHmmss)")
+    parser.add_argument("--force-tag", action="store_true", help="Force overwrite/push git tag if it already exists")
+    parser.add_argument("--title", dest="release_title", default=None, help="Custom release title (defaults to release tag)")
     parser.add_argument("--notes", dest="custom_notes", default=None, help="Custom release notes to include above auto-generated changelog")
     parser.add_argument("-y", "--yes", action="store_true", help="Skip confirmation prompt")
     parser.add_argument("--draft", action="store_true", help="Save release as draft on GitHub")
@@ -240,10 +265,21 @@ def main():
         print(f"❌ Error: Could not parse versionCode or versionName from {version_file}", file=sys.stderr)
         sys.exit(1)
 
-    tag = detect_tag_name(project_root, version_name, args.explicit_tag, args.tag_prefix)
+    build_number = get_build_number(args.custom_build_number)
 
     # 4. Fetch latest GitHub release
     latest_release_label, latest_tag = get_latest_release(project_root)
+
+    # Determine release tag
+    include_build_number = args.include_build_number
+    if args.explicit_tag:
+        tag = args.explicit_tag
+        tag_without_build = tag
+        tag_with_build = tag
+        include_build_number = False
+    else:
+        tag_without_build = detect_tag_name(project_root, version_name, prefix=args.tag_prefix)
+        tag_with_build = detect_tag_name(project_root, f"{version_name}.{build_number}", prefix=args.tag_prefix)
 
     print("=========================================")
     print(f"🚀 {app_name} GitHub Release & APK Upload")
@@ -253,12 +289,42 @@ def main():
     else:
         print("Latest Release : None (first release)")
     print(f"Target Version : {version_name} (versionCode: {version_code})")
-    print(f"New Release Tag: {tag}")
+    print(f"Build Number   : {build_number}")
     print(f"Version Source : {version_file.relative_to(project_root)}")
     print(f"Gradle Task    : {args.gradle_task}")
     if args.flavor:
         print(f"Target Flavor  : {args.flavor}")
     print("=========================================")
+
+    # Prompt whether to include build number if not explicitly specified via CLI flags
+    if not args.explicit_tag:
+        if include_build_number is None:
+            if not args.yes:
+                tag_collides = (latest_tag == tag_without_build) or check_remote_tag_exists(project_root, tag_without_build)
+                if tag_collides:
+                    print(f"⚠️  Notice: Base tag '{tag_without_build}' matches latest release or already exists on remote origin.")
+                    prompt_str = f"Include build number in tag that gets created? (e.g., '{tag_with_build}') [Y/n]: "
+                    default_choice = True
+                else:
+                    prompt_str = f"Include build number in tag that gets created? (e.g., '{tag_with_build}') [y/N]: "
+                    default_choice = False
+
+                try:
+                    ans = input(prompt_str).strip().lower()
+                    if not ans:
+                        include_build_number = default_choice
+                    else:
+                        include_build_number = ans in ("y", "yes")
+                except (KeyboardInterrupt, EOFError):
+                    print("\nAborted.")
+                    sys.exit(130)
+            else:
+                include_build_number = False
+
+        tag = tag_with_build if include_build_number else tag_without_build
+        print(f"🏷️  Release Tag: {tag}\n")
+    else:
+        print(f"🏷️  Release Tag: {tag}\n")
 
     if latest_tag == tag:
         print(f"⚠️  Warning: Tag '{tag}' matches the latest release tag on GitHub!")
@@ -317,8 +383,11 @@ def main():
         print(f"❌ Error: Gradle wrapper not found at {gradlew}", file=sys.stderr)
         sys.exit(1)
 
+    # Ensure Gradle uses the resolved build number
+    os.environ["BUILD_NUMBER"] = build_number
+
     # Execute via mise if available, else directly
-    build_cmd = [str(gradlew), args.gradle_task]
+    build_cmd = [str(gradlew), args.gradle_task, f"-PbuildNumber={build_number}"]
     if shutil.which("mise"):
         build_cmd = ["mise", "exec", "--"] + build_cmd
 
@@ -395,9 +464,14 @@ def main():
             subprocess.run(["git", "tag", "-f", "-a", tag, "-m", f"Release {tag}"], cwd=str(project_root), check=True)
 
     print(f"⬆️  Pushing tag '{tag}' to origin...")
-    push_tag = subprocess.run(["git", "push", "origin", tag], cwd=str(project_root))
+    push_cmd = ["git", "push", "origin", tag]
+    if args.force_tag:
+        push_cmd.append("--force")
+    push_tag = subprocess.run(push_cmd, cwd=str(project_root))
     if push_tag.returncode != 0:
-        print("❌ Failed to push tag to origin.", file=sys.stderr)
+        print(f"❌ Failed to push tag '{tag}' to origin.", file=sys.stderr)
+        if check_remote_tag_exists(project_root, tag):
+            print("   Hint: Tag already exists on remote origin. Consider including the build number in the tag, bumping the version, or using --force-tag.", file=sys.stderr)
         sys.exit(push_tag.returncode)
 
     # 8. Create GitHub Release
@@ -414,7 +488,7 @@ def main():
         notes_parts.append(args.custom_notes.strip() + "\n")
 
     release_notes = "\n".join(notes_parts)
-    default_title = args.release_title or (f"v{version_name}" if tag.startswith("v") else version_name)
+    default_title = args.release_title or (f"v{version_name}" if (tag.startswith("v") and not include_build_number) else tag)
 
     release_cmd = [
         "gh", "release", "create", tag,
